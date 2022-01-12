@@ -1,6 +1,6 @@
 ;;; tests for the emacs db.
 
-(require 'cl)
+(require 'cl-lib)
 (require 'ert)
 (require 'db)
 (require 'kv)
@@ -56,12 +56,12 @@
                  ("username" . "test002")
                  ("title" . "Mr")
                  ("surname" . "Test")))))
-    (loop for (key . value) in data
-       do (db-put key value db))
+    (cl-loop for (key . value) in data
+             do (db-put key value db))
     (db-map (lambda (key value)
               (setq
                collected
-               (acons key value collected))) db)
+               (cl-acons key value collected))) db)
     (should
      (equal
       (kvalist-sort collected 'kvcmp)
@@ -90,24 +90,24 @@
 (ert-deftest db-hash/save ()
   "Test the saving of a hash db."
   (unwind-protect
-       (progn
-         (let ((db (db-make
-                    ;; You shouldn't use an extension but let db deal
-                    ;; with it.
-                    '(db-hash :filename "/tmp/test-db"))))
-           ;; Override the save so it does nothing from put
-           (flet ((db-hash/save (db)
-                    t))
-             (db-put 'test1 "value1" db)
-             (db-put 'test2 "value2" db))
-           ;; And now save
-           (db-hash/save db))
-         ;; And now load in a different scope
-         (let ((db (db-make
-                    '(db-hash :filename "/tmp/test-db"))))
-           (should
-            (equal "value1"
-                   (db-get 'test1 db)))))
+      (progn
+        (let ((db (db-make
+                   ;; You shouldn't use an extension but let db deal
+                   ;; with it.
+                   '(db-hash :filename "/tmp/test-db"))))
+          ;; Override the save so it does nothing from put
+          (cl-flet ((db-hash/save (db)
+                      t))
+            (db-put 'test1 "value1" db)
+            (db-put 'test2 "value2" db))
+          ;; And now save
+          (db-hash/save db))
+        ;; And now load in a different scope
+        (let ((db (db-make
+                   '(db-hash :filename "/tmp/test-db"))))
+          (should
+           (equal "value1"
+                  (db-get 'test1 db)))))
     (delete-file "/tmp/test-db.elc")))
 
 (ert-deftest db-filter ()
@@ -129,8 +129,8 @@
      '(("uid" . "test001")
        ("fullname" . "test user 1"))
      db)
-    (flet ((filt (key value)
-             (cdr (assoc "fullname" value))))
+    (cl-flet ((filt (key value)
+                (cdr (assoc "fullname" value))))
       (let ((filtered
              (db-make
               `(db-filter

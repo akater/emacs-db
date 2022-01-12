@@ -41,7 +41,7 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl))
+  (require 'cl-lib))
 (require 'kv)
 
 (defun db/make-type-store ()
@@ -51,7 +51,7 @@
 (defvar db/types (db/make-type-store)
   "Hash of database type ids against funcs?")
 
-(defun* db-make (reference)
+(cl-defun db-make (reference)
   "Make a DB based on the REFERENCE."
   (if (and (listp reference)
            (eq 'db-hash (car reference)))
@@ -101,10 +101,10 @@ returned."
                    retlist))))
              db query)
     (if filter
-        (loop for p in retlist
-           if (cdr p)
-           collect p)
-        retlist)))
+        (cl-loop for p in retlist
+                 if (cdr p)
+                 collect p)
+      retlist)))
 
 (defun db-query (db query)
   "Do QUERY on DB and return the result.
