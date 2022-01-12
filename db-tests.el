@@ -135,7 +135,7 @@
              (db-make
               `(db-filter
                 :source ,db
-                :filter filt))))
+                :filter ,#'filt))))
         (plist-get filtered :source)
         (should
          (equal (db-get "test002" filtered) "test user 2"))))))
