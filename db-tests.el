@@ -1,4 +1,4 @@
-;;; tests for the emacs db.
+;;; tests for the emacs db.  -*- lexical-binding: t -*-
 
 (require 'cl-lib)
 (require 'ert)
@@ -96,7 +96,7 @@
                    ;; with it.
                    '(db-hash :filename "/tmp/test-db"))))
           ;; Override the save so it does nothing from put
-          (cl-flet ((db-hash/save (db)
+          (cl-flet ((db-hash/save (_db)
                       t))
             (db-put 'test1 "value1" db)
             (db-put 'test2 "value2" db))
@@ -129,7 +129,7 @@
      '(("uid" . "test001")
        ("fullname" . "test user 1"))
      db)
-    (cl-flet ((filt (key value)
+    (cl-flet ((filt (_key value)
                 (cdr (assoc "fullname" value))))
       (let ((filtered
              (db-make
